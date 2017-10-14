@@ -15,5 +15,10 @@
     "webpack": "^3.7.1"
   },
   "author": "Dennis Vriend",
-  "license": "Apache2"
+  "license": "Apache2",
+  "dependencies": {
+    "space-lift": "^0.5.1",
+    "validate.ts": "^2.0.5",
+    "validator.ts": "^0.2.2"
+  }
 }

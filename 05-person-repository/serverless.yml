@@ -46,7 +46,7 @@ functions:
           path: /person/{id}
 
   update-person:
-        handler: src/handler/person/PersonHandler.update
+        handler: src/handler/person/PersonHandler.patch
         events:
           - http:
               method: patch
@@ -56,5 +56,5 @@ functions:
         handler: src/handler/person/PersonHandler.remove
         events:
           - http:
-              method: patch
+              method: delete
               path: /person/{id}

@@ -59,6 +59,19 @@ Schema:
   - config:
     - help: https://webpack.js.org/concepts/configuration/
     - file: webpack.config.js
+- dynamodb:
+  - dev-guide:
+    - js-api: http://docs.aws.amazon.com/amazondynamodb/latest/developerguide/GettingStarted.NodeJs.html
+  - dynasty:
+    - description: Dynasty is a clean and simple Amazon DynamoDB client for Node with baked in Promise support.
+    - home: http://dynastyjs.com/index.html
+- space-lift:
+  - home: https://github.com/AlexGalays/spacelift
+  - install: npm install space-lift
+- validator.ts:
+  - home: https://github.com/pleerock/class-validator
+  - install: npm install validator.ts --save
+
 
 ## Resources
 - http://definitelytyped.org/
@@ -69,5 +82,7 @@ Schema:
 - https://webpack.github.io/docs/configuration.html#externals
 - https://github.com/asprouse/serverless-webpack-plugin
 - https://webpack.js.org/guides/caching/
+- https://vsavkin.com/functional-typescript-316f0e003dc6
+- https://www.sitepen.com/blog/2013/12/31/typescript-cheat-sheet/
 
 Note: You don't need this lib "@types/aws-sdk": "2.7.0` anymore as `"aws-sdk": "^2.133.0",` comes with its own lib, you have to put it in `devDependencies` though.

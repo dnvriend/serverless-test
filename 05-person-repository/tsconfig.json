@@ -1,6 +1,7 @@
 {
   "target": "es2015",
   "compilerOptions": {
+    "experimentalDecorators": true,
     "moduleResolution": "node",
     "sourceMap": false,
     "noImplicitAny": true,

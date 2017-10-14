@@ -1,5 +1,42 @@
 import {DocumentClient} from "aws-sdk/lib/dynamodb/document_client";
 import v4 = require("uuid/v4");
+import AttributeMap = DocumentClient.AttributeMap;
+import lift, {Option} from 'space-lift'
+import {NotEmpty} from "validator.ts/decorator/Validation";
+import {Validator} from "validator.ts/Validator";
+
+export class Person {
+    constructor(id: string, name: string, age: string) {
+        this.id = id
+        this.name = name
+        this.age = age
+    }
+
+    static validate(str: string): Promise<Person> {
+        let js = JSON.parse(str)
+        let validator = new Validator()
+        return validator.validateAsync(new Person(
+            Option(js.id).getOrElse(""),
+            Option(js.name).getOrElse(""),
+            Option(js.age).getOrElse("")))
+    }
+
+    id: string;
+
+    @NotEmpty()
+    name: string;
+
+    @NotEmpty()
+    age: string;
+}
+
+let attributesToPerson = (attributes: AttributeMap) => {
+    return new Person(
+        attributes.id,
+        attributes.name,
+        attributes.age
+    )
+};
 
 /**
  * Person Repository
@@ -8,34 +45,24 @@ export class PersonRepository {
     constructor(public readonly tableName: string, public readonly db: DocumentClient) {
     }
 
-    private mapItem(item: any) {
-        return {
-            id: item.id,
-            name: item.name,
-            age: item.age
-        }
-    }
-
-    list() {
+    list(): Promise<never | Array<Person>> {
         return this.db.scan({
             TableName: this.tableName
         }).promise().then(data => {
-            if (data.Items) {
-                return data.Items.map(this.mapItem)
-            }
+            return Option(data.Items)
+                .map(xs => xs.map(attributesToPerson))
+                .getOrElse([])
         })
     }
 
-    get(id: string) {
+    get(id: string): Promise<never | Option<Person>> {
         return this.db.get({
             TableName: this.tableName,
             Key: {
                 id: id
             }
         }).promise().then(data => {
-            if (data.Item) {
-                return this.mapItem(data.Item)
-            }
+            return Option(data.Item).map(attributesToPerson)
         })
     }
 
@@ -48,23 +75,27 @@ export class PersonRepository {
         }).promise()
     }
 
-    update(person: any) {
+    update(id: string, person: Person): Promise<never | Option<Person>> {
         return this.db.update({
             TableName: this.tableName,
             Key: {
-                id: person.id
+                id: id
             },
-            AttributeUpdates: {
-                name: person.name,
-                age: person.age
+            UpdateExpression: "SET #n = :name, age = :age",
+            ExpressionAttributeValues: {
+                ":name": person.name,
+                ":age": person.age
             },
-            ReturnValues: "ALL_NEW"
+            ExpressionAttributeNames: {
+                "#n": "name"
+            },
+            ReturnValues: "UPDATED_NEW"
         }).promise().then(data => {
-            if(data.Attributes) return {id: data.Attributes.id, name: data.Attributes.name, age: data.Attributes.age}
+            return Option(data.Attributes).map(attributesToPerson)
         })
     }
 
-    put(person: any) {
+    put(person: Person): Promise<never | Option<Person>> {
         let id = v4();
         return this.db.put({
             TableName: this.tableName,
@@ -75,7 +106,7 @@ export class PersonRepository {
             },
             ReturnValues: "ALL_NEW"
         }).promise().then(data => {
-            if(data.Attributes) return {id: data.Attributes.id, name: data.Attributes.name, age: data.Attributes.age}
+            return Option(data.Attributes).map(attributesToPerson)
         })
     }
 }
