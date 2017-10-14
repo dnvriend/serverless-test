@@ -1,0 +1,40 @@
+service: helloworld-scala
+
+provider:
+  name: aws
+  runtime: java8
+  region:
+
+package:
+  artifact: target/scala-2.12/hello.jar
+
+functions:
+  method-handler:
+    handler: hello.MethodBased::myHandlerMethod
+  stream-handler:
+    handler: hello.MethodBased::streamHandler
+    events:
+      - http:
+          path: /stream
+          method: post
+#  interface-handler:
+#    handler: hello.RequestHandlerBased
+  input-as-string-handler:
+    handler: hello.MethodBased::inputAsStringHandler
+    events:
+      - http:
+          path: /person
+          method: post
+  input-as-gw:
+    handler: hello.MethodBased::inputAsApiGatewayRequest
+    events:
+      - http:
+          path: /agr
+          method: post
+  scala-handler:
+    handler: hello.MyScalaHandler::handleRequest
+    events:
+      - http:
+          path: /
+          method: post
+

@@ -1,0 +1,31 @@
+service: urlshortener
+
+frameworkVersion: ">=1.8.0 <2.0.0"
+
+provider:
+  name: aws
+  runtime: nodejs4.3
+
+functions:
+  main:
+    handler: main/index.handler
+    events:
+      - http:
+          path: /
+          method: get
+  create:
+    handler: create/index.handler
+    events:
+      - http:
+          path: /
+          method: post
+  redirect:
+    handler: redirect/index.handler
+    events:
+      - http:
+          path: /{slug}
+          method: get
+    environment:
+      URL_INSTALL: https://serverless.com/framework/docs/providers/aws/guide/installation/
+      URL_ABCD: http://serverless.com/
+      URL_AWS: https://aws.amazon.com/

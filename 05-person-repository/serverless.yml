@@ -1,0 +1,60 @@
+service:
+  name: aws-nodejs-typescript
+
+plugins:
+  - serverless-webpack
+
+provider:
+  name: aws
+  runtime: nodejs6.10
+  region: eu-central-1
+  environment:
+    SLS_STAGE: ${opt:stage, self:provider.stage}
+  iamRoleStatements:
+      - Action:
+         - dynamodb:*
+        Resource: "arn:aws:dynamodb:eu-central-1:436740350302:table/dev-persons"
+        Effect: Allow
+
+functions:
+  hello:
+    handler: src/handler/hello/HelloHandler.get
+    events:
+      - http:
+          method: any
+          path: /hello
+
+  list-persons:
+        handler: src/handler/person/PersonHandler.list
+        events:
+          - http:
+              method: get
+              path: /person
+
+  post-person:
+        handler: src/handler/person/PersonHandler.post
+        events:
+          - http:
+              method: post
+              path: /person
+
+  get-person:
+    handler: src/handler/person/PersonHandler.get
+    events:
+      - http:
+          method: get
+          path: /person/{id}
+
+  update-person:
+        handler: src/handler/person/PersonHandler.update
+        events:
+          - http:
+              method: patch
+              path: /person/{id}
+
+  delete-person:
+        handler: src/handler/person/PersonHandler.remove
+        events:
+          - http:
+              method: patch
+              path: /person/{id}
