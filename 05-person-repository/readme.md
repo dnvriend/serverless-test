@@ -14,6 +14,25 @@ Schema:
 - name: S
 - age: S
 
+## publishing a message to kinesis for test
+deploy the lambda:
+
+```
+$ sls deploy -f personcreated-handler
+```
+
+publish a message:
+
+```
+$ aws kinesis put-record --stream-name PersonCreatedStream --data '{"id": "1", "name":"dennis", "age":"42"}' --partition-key 1
+```
+
+get the log output:
+
+```
+$ sls -f personcreated-handler logs
+```
+
 ## Tools
 - npm: Nodejs Package Manager
   - home: https://www.npmjs.com/

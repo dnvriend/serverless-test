@@ -45,6 +45,13 @@ provider:
         - dynamodb:GetRecords
         - dynamodb:DescribeStream
         - dynamodb:ListStreams
+    - Effect: Allow
+      Resource:
+        Fn::GetAtt:
+          - PersonCreatedStream
+          - Arn
+      Action:
+        - kinesis:*
 
 functions:
   hello:
@@ -101,6 +108,18 @@ functions:
           batchSize: 100
           startingPosition: LATEST
           enabled: True
+  personcreated-handler:
+    handler: src/handler/person/PersonCreatedHandler.handle
+    events:
+      - stream:
+          type: kinesis
+          arn:
+            Fn::GetAtt:
+              - PersonCreatedStream
+              - Arn
+          batchSize: 100
+          startingPosition: TRIM_HORIZON # LATEST | TRIM_HORIZON
+          enabled: True
 
 #####
 ## Notice!
@@ -139,6 +158,12 @@ resources:
         ProvisionedThroughput:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
+    PersonCreatedStream:
+      Type: "AWS::Kinesis::Stream"
+      Properties:
+        Name: PersonCreatedStream
+        RetentionPeriodHours: 24
+        ShardCount: 3
   Outputs:
     PersonsTableArn:
       Description: "The ARN for the dynamodb persons table"
