@@ -15,9 +15,36 @@ provider:
     SLS_STAGE: ${opt:stage, self:provider.stage}
   iamRoleStatements:
     - Effect: Allow
-      Resource: "arn:aws:dynamodb:eu-central-1:*:table/*"
+      Resource:
+        Fn::GetAtt:
+          - PersonsTable
+          - Arn      
       Action:
-        - dynamodb:*
+        - dynamodb:PutItem
+        - dynamodb:GetItem
+        - dynamodb:Scan
+        - dynamodb:DeleteItem
+        - dynamodb:Query
+    - Effect: Allow
+      Resource:
+        Fn::GetAtt:
+          - PersonsDistinctTable
+          - Arn
+      Action:
+        - dynamodb:PutItem
+        - dynamodb:GetItem
+        - dynamodb:Scan
+        - dynamodb:DeleteItem
+        - dynamodb:Query
+    - Effect: Allow
+      Resource:
+        Fn::GetAtt:
+          - PersonsTable
+          - StreamArn
+      Action:
+        - dynamodb:GetRecords
+        - dynamodb:DescribeStream
+        - dynamodb:ListStreams
 
 functions:
   hello:

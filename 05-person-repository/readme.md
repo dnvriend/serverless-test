@@ -65,6 +65,7 @@ Schema:
   - dynasty:
     - description: Dynasty is a clean and simple Amazon DynamoDB client for Node with baked in Promise support.
     - home: http://dynastyjs.com/index.html
+    - iam reference: https://iam.cloudonaut.io/reference/dynamodb.html
 - space-lift:
   - home: https://github.com/AlexGalays/spacelift
   - install: npm install space-lift
