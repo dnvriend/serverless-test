@@ -71,6 +71,13 @@ Schema:
 - validator.ts:
   - home: https://github.com/pleerock/class-validator
   - install: npm install validator.ts --save
+- yaml-lint:
+  - home: https://github.com/rasshofer/yaml-lint
+  - install: npm install -g yaml-lint
+  - usage: yamllint serverless.yaml
+- aws:
+  - [Systems Manager Parameter Store (SSM)](http://docs.aws.amazon.com/systems-manager/latest/userguide/systems-manager-paramstore.html)
+
 
 
 ## Resources

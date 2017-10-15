@@ -30,7 +30,7 @@ export class Person {
     age: string;
 }
 
-let attributesToPerson = (attributes: AttributeMap) => {
+let mapAttributes = (attributes: AttributeMap) => {
     return new Person(
         attributes.id,
         attributes.name,
@@ -50,7 +50,7 @@ export class PersonRepository {
             TableName: this.tableName
         }).promise().then(data => {
             return Option(data.Items)
-                .map(xs => xs.map(attributesToPerson))
+                .map(xs => xs.map(mapAttributes))
                 .getOrElse([])
         })
     }
@@ -62,7 +62,7 @@ export class PersonRepository {
                 id: id
             }
         }).promise().then(data => {
-            return Option(data.Item).map(attributesToPerson)
+            return Option(data.Item).map(mapAttributes)
         })
     }
 
@@ -91,7 +91,7 @@ export class PersonRepository {
             },
             ReturnValues: "UPDATED_NEW"
         }).promise().then(data => {
-            return Option(data.Attributes).map(attributesToPerson)
+            return Option(data.Attributes).map(mapAttributes)
         })
     }
 
@@ -104,9 +104,8 @@ export class PersonRepository {
                 name: person.name,
                 age: person.age
             },
-            ReturnValues: "ALL_NEW"
-        }).promise().then(data => {
-            return Option(data.Attributes).map(attributesToPerson)
+        }).promise().then(() => {
+            return Option(new Person(id, person.name, person.age))
         })
     }
 }

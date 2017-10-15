@@ -1,5 +1,5 @@
 service:
-  name: aws-nodejs-typescript
+  name: person-repository
 
 plugins:
   - serverless-webpack
@@ -7,14 +7,17 @@ plugins:
 provider:
   name: aws
   runtime: nodejs6.10
+  stage: dev
   region: eu-central-1
+  memorySize: 128 # Overwrite the default memory size. Default is 1024
+  timeout: 30 # The default is 6 seconds. Note: API Gateway current maximum is 30 seconds
   environment:
     SLS_STAGE: ${opt:stage, self:provider.stage}
   iamRoleStatements:
-      - Action:
-         - dynamodb:*
-        Resource: "arn:aws:dynamodb:eu-central-1:436740350302:table/dev-persons"
-        Effect: Allow
+    - Effect: Allow
+      Resource: "arn:aws:dynamodb:eu-central-1:*:table/*"
+      Action:
+        - dynamodb:*
 
 functions:
   hello:
@@ -23,38 +26,109 @@ functions:
       - http:
           method: any
           path: /hello
-
   list-persons:
         handler: src/handler/person/PersonHandler.list
         events:
           - http:
               method: get
               path: /person
-
   post-person:
         handler: src/handler/person/PersonHandler.post
         events:
           - http:
               method: post
               path: /person
-
   get-person:
     handler: src/handler/person/PersonHandler.get
     events:
       - http:
           method: get
           path: /person/{id}
-
   update-person:
-        handler: src/handler/person/PersonHandler.patch
-        events:
-          - http:
-              method: patch
-              path: /person/{id}
-
+    handler: src/handler/person/PersonHandler.patch
+    events:
+      - http:
+          method: patch
+          path: /person/{id}
   delete-person:
-        handler: src/handler/person/PersonHandler.remove
-        events:
-          - http:
-              method: delete
-              path: /person/{id}
+    handler: src/handler/person/PersonHandler.remove
+    events:
+      - http:
+          method: delete
+          path: /person/{id}
+  lp-distinct:
+    handler: src/handler/person/PersonDistinctHandler.list
+    events:
+      - http:
+          method: get
+          path: /distinct
+  ip-distinct:
+    handler: src/handler/person/PersonDistinctHandler.handle
+    events:
+      - stream:
+          type: dynamodb
+          arn:
+            Fn::GetAtt:
+              - PersonsTable
+              - StreamArn
+          batchSize: 100
+          startingPosition: LATEST
+          enabled: True
+
+#####
+## Notice!
+##
+## - For DynamoDB you only need to provide the attributes that will
+##   become the key or keys! DynamoDB is schemaless, so when inserting or
+##   updating, DynamoDB is only interested in the keys. No need to write out
+##   a schema, as DynamoDB is schemaless
+resources:
+  Resources:
+    PersonsTable:
+      Type: "AWS::DynamoDB::Table"
+      Properties:
+        TableName: ${opt:stage, self:provider.stage}-persons-table
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+        StreamSpecification:
+          StreamViewType: "NEW_IMAGE" # Valid Values: NEW_IMAGE | OLD_IMAGE | NEW_AND_OLD_IMAGES | KEYS_ONLY
+        ProvisionedThroughput:
+          ReadCapacityUnits: 2
+          WriteCapacityUnits: 2
+    PersonsDistinctTable:
+      Type: "AWS::DynamoDB::Table"
+      Properties:
+        TableName: ${opt:stage, self:provider.stage}-persons-distinct-table
+        AttributeDefinitions:
+          - AttributeName: name
+            AttributeType: S
+        KeySchema:
+          - AttributeName: name
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+  Outputs:
+    PersonsTableArn:
+      Description: "The ARN for the dynamodb persons table"
+      Value:
+        "Fn::GetAtt": [PersonsTable, Arn]
+      Export:
+        Name: personsTableArn
+    PersonsTableStreamArn:
+      Description: "The ARN for the dynamodb persons table stream"
+      Value:
+        "Fn::GetAtt": [PersonsTable, StreamArn]
+      Export:
+        Name: personsTableStreamArn
+    PersonsDistinctTableArn:
+      Description: "The ARN for the dynamodb persons distinct table"
+      Value:
+        "Fn::GetAtt": [PersonsDistinctTable, Arn]
+      Export:
+        Name: personsDistinctTableArn
+
