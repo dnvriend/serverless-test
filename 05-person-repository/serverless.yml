@@ -17,6 +17,18 @@ provider:
     - Effect: Allow
       Resource:
         Fn::GetAtt:
+          - CountersTable
+          - Arn      
+      Action:
+        - dynamodb:PutItem
+        - dynamodb:GetItem
+        - dynamodb:UpdateItem
+        - dynamodb:Scan
+        - dynamodb:DeleteItem
+        - dynamodb:Query
+    - Effect: Allow
+      Resource:
+        Fn::GetAtt:
           - PersonsTable
           - Arn      
       Action:
@@ -62,6 +74,12 @@ functions:
       - http:
           method: any
           path: /hello
+  counter-nextvalue:
+        handler: src/handler/counter/CounterHandler.nextValue
+        events:
+          - http:
+              method: get
+              path: /counter/{counterName}
   list-persons:
         handler: src/handler/person/PersonHandler.list
         events:
@@ -98,8 +116,20 @@ functions:
       - http:
           method: get
           path: /distinct
-  ip-distinct:
+  ip-distinct: # multiple triggers on the PersonTable
     handler: src/handler/person/PersonDistinctHandler.handle
+    events:
+      - stream:
+          type: dynamodb
+          arn:
+            Fn::GetAtt:
+              - PersonsTable
+              - StreamArn
+          batchSize: 100
+          startingPosition: LATEST
+          enabled: True
+  pl-handler: # multiple triggers on the PersonTable
+    handler: src/handler/person/PersonLoggerHandler.handle
     events:
       - stream:
           type: dynamodb
@@ -145,8 +175,21 @@ resources:
         StreamSpecification:
           StreamViewType: "NEW_IMAGE" # Valid Values: NEW_IMAGE | OLD_IMAGE | NEW_AND_OLD_IMAGES | KEYS_ONLY
         ProvisionedThroughput:
-          ReadCapacityUnits: 2
-          WriteCapacityUnits: 2
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+    CountersTable:
+      Type: "AWS::DynamoDB::Table"
+      Properties:
+        TableName: ${opt:stage, self:provider.stage}-counters-table
+        AttributeDefinitions:
+          - AttributeName: counter
+            AttributeType: S
+        KeySchema:
+          - AttributeName: counter
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
     PersonsDistinctTable:
       Type: "AWS::DynamoDB::Table"
       Properties:
@@ -185,4 +228,10 @@ resources:
         "Fn::GetAtt": [PersonsDistinctTable, Arn]
       Export:
         Name: personsDistinctTableArn
+    CountersTableArn:
+      Description: "The ARN for the dynamodb counters table"
+      Value:
+        "Fn::GetAtt": [CountersTable, Arn]
+      Export:
+        Name: countersTableArn
 
