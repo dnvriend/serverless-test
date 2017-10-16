@@ -20,3 +20,19 @@ scalacOptions ++= Seq(
   "-deprecation",
   "-feature",
   "-Xfatal-warnings")
+
+val slsDeploy = taskKey[Unit]("Deploy to serverless")
+slsDeploy := {
+    val log = streams.value.log
+    val x = (assembly dependsOn clean).value
+    "sls deploy".!(log)
+}
+
+val slsDeployLambda = inputKey[Unit]("Deploy a single lamda")
+slsDeployLambda := {
+    import sbt.complete.DefaultParsers._
+    val log = streams.value.log
+    val lambdaName: String = (Space ~> StringBasic).parsed
+    val x = (assembly dependsOn clean).value
+    s"sls deploy -f ${lambdaName}".!(log)
+}
