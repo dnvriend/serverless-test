@@ -22,6 +22,7 @@ provider:
       Action:
         - dynamodb:PutItem
         - dynamodb:GetItem
+        - dynamodb:UpdateItem
         - dynamodb:Scan
         - dynamodb:DeleteItem
         - dynamodb:Query
@@ -32,6 +33,7 @@ provider:
           - Arn
       Action:
         - dynamodb:PutItem
+        - dynamodb:UpdateItem
         - dynamodb:GetItem
         - dynamodb:Scan
         - dynamodb:DeleteItem
