@@ -6,10 +6,10 @@ let decodeData = (data: Data) => {
 };
 
 export let handle = (event: GetRecordsOutput, ctx: Context) => {
-    console.log("handling event: " + JSON.stringify(event));
+    console.log(`handling event: ${JSON.stringify(event)}`)
     event.Records
         .map((record: any) => record.kinesis.data)
         .map(decodeData)
         .map((str: string) => JSON.parse(str))
-        .forEach((person:any) => console.log("person: " + JSON.stringify(person)));
+        .forEach((person:any) => console.log(`person: ${JSON.stringify(person)}`));
 };
