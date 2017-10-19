@@ -72,8 +72,11 @@ functions:
     handler: src/handler/hello/HelloHandler.get
     events:
       - http:
-          method: any
+          method: get
           path: /hello
+          authorizer:
+            arn: 
+              "arn:aws:cognito-idp:eu-central-1:436740350302:userpool/eu-central-1_OTWRWDA7U" # 'Fn::GetAtt': [ authUserPoolArn, Arn ] # there is an issue when referencing the Arn, until fixed use hardcoded arn
   counter-nextvalue:
         handler: src/handler/counter/CounterHandler.nextValue
         events:
@@ -209,6 +212,20 @@ resources:
         Name: PersonCreatedStream
         RetentionPeriodHours: 24
         ShardCount: 3
+    AuthUserPool:
+      Type: "AWS::Cognito::UserPool"
+      Properties:
+        UserPoolName: "auth_pool"
+        AdminCreateUserConfig:
+          AllowAdminCreateUserOnly: True
+          UnusedAccountValidityDays: 30
+        Policies:
+          PasswordPolicy:
+            MinimumLength: 6 # The minimum length of the password policy that you have set. Cannot be less than 6.
+            RequireLowercase: True # In the password policy that you have set, refers to whether you have required users to use at least one lowercase letter in their password.
+            RequireNumbers: False # In the password policy that you have set, refers to whether you have required users to use at least one number in their password.
+            RequireSymbols: False # In the password policy that you have set, refers to whether you have required users to use at least one symbol in their password.
+            RequireUppercase: False # In the password policy that you have set, refers to whether you have required users to use at least one uppercase letter in their password.
   Outputs:
     PersonsTableArn:
       Description: "The ARN for the dynamodb persons table"
@@ -234,4 +251,9 @@ resources:
         "Fn::GetAtt": [CountersTable, Arn]
       Export:
         Name: countersTableArn
-
+    AuthUserPoolArn:
+      Description: "The ARN for the user pool"
+      Value:
+        "Fn::GetAtt": [AuthUserPool, Arn]
+      Export:
+        Name: authUserPoolArn

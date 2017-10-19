@@ -1,0 +1,40 @@
+see: http://docs.aws.amazon.com/cli/latest/reference/cognito-idp/index.html
+
+## Note: serverless.yml creates the user pool, but maybe this must be scripted externally
+and not via cloudformation...
+
+aws cognito-idp list-user-pools --max-results 1 --region eu-central-1
+
+aws cognito-idp create-user-pool-client \
+--user-pool-id eu-central-1_OTWRWDA7U \
+--explicit-auth-flows ADMIN_NO_SRP_AUTH \
+--client-name hello-lambda \
+--region eu-central-1
+
+aws cognito-idp admin-create-user \
+--user-pool-id eu-central-1_OTWRWDA7U \
+--username dennis \
+--temporary-password secret \
+--region eu-central-1
+
+aws cognito-idp admin-initiate-auth \
+--user-pool-id eu-central-1_OTWRWDA7U \
+--client-id 4n1kvdgkiumcc70cp275m5a4sc \
+--auth-flow ADMIN_NO_SRP_AUTH \
+--auth-parameters USERNAME=dennis,PASSWORD=secret \
+--region eu-central-1
+
+(copy returned session token)
+
+aws cognito-idp admin-respond-to-auth-challenge --user-pool-id eu-central-1_OTWRWDA7U --client-id 4n1kvdgkiumcc70cp275m5a4sc --challenge-name NEW_PASSWORD_REQUIRED --challenge-responses NEW_PASSWORD=password,USERNAME=dennis --session "QYAoAHso7AxSAs_elx47LFPq2-B8l_rG9EAydC8ql2L3jUAHUmpi9rTY4fr0wrbfqJQ1YHYHGQkdU9WL2EKlJXvSg9KVw6HyYYulSzvm8vdscs1LZNkZWW3bcjNvH0k8tq7SzYS8tTkvVMpR6nhywXPXO8XIZe5T9TIuoeWKbMQZ_H-Nc-XCPvkaFCvz-vDYoWBgRBAnRPikjKF--VA2-m6TL-meaezOmWHAlskh955v99wO79VqTbr3pGhpASXxLRSpblbO4h-evauTRD1OPtevqSko6Rg3TgcZ1q5gZ-em0Pxi0N_ZmsNy4Yf6aoAPOqClU6lzeiLtqDuo0jTPJUNcDAigRJt2xBGRKAZjKAN0GMvArseLpt1i4P9YmTezElLIhat76HkN8vP_96iCC-5Yi9LoKuUwlUn9dye0O2Wbybz1QiZOhOKqLYubJ8Ak91gpFSTq_OYuyKpc2ALORsP5OLz4b_Vtg_uRFHQzI3CoCEVqyBRkl-OMpygMXCJSb7Te7R2__18caiThclZpbcWahKsESuxgpRIS-pNp6fA4qxUo_OQCoPmVV29eGGGwp8UHNIEoVPb27oG362JwKPBN84SvkIRuEQTFzXIp71ILQK6ov_yNJE2ke4r3H4wEnzIBw19aPm5krY3sIsydZ0UP2gm_Dq0v87leTTSaFLEXljOZQfI6IU9iCGvbdv6qdGSQEg"
+
+(copy id token) and put in Authorization header
+
+http --verbose https://pbhfvp3o0h.execute-api.eu-central-1.amazonaws.com/dev/hello Authorization:eyJraWQiOiI4TmhWU1lKSnNxXC90V2E4aDA5NG1KRG5mNkhwbk81eVBKdExOa3lkSUVXMD0iLCJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJmNDQ4M2ZhNS02NWU5LTQwYTgtOTI0Ni1jYjg0NWY0NWExOTIiLCJhdWQiOiI0bjFrdmRna2l1bWNjNzBjcDI3NW01YTRzYyIsInRva2VuX3VzZSI6ImlkIiwiYXV0aF90aW1lIjoxNTA4NDMzODUwLCJpc3MiOiJodHRwczpcL1wvY29nbml0by1pZHAuZXUtY2VudHJhbC0xLmFtYXpvbmF3cy5jb21cL2V1LWNlbnRyYWwtMV9PVFdSV0RBN1UiLCJjb2duaXRvOnVzZXJuYW1lIjoiZGVubmlzIiwiZXhwIjoxNTA4NDM3NDUwLCJpYXQiOjE1MDg0MzM4NTB9.xAFgVF2dYYNj6aLqrHXKLqDM1VnFWM-2LDklOHmcr_Xce_ip0yno1n149paORVtdyC9RZJ0ds6W4Her_FrU4rOp5LakJ6_6iLKIBy71dhK-AnubmhiA6YVE50QqjA2rjoCdTQfdLE9HJu5UlKFEuV0JJwco42-gHKnKAVVfwBwCIhuZ9FSgOmUCACDislfCM5skGjpiADxacgv6Jgo_Cx9ar8vQe8d-dFfP5izegpFqo5ecyMeejc7o26kBcN__PVLVJaxHvzNNpe4wh2Nh37rzflPy_Le0YnXVg-a688YCMUCQE2a_SdJfwhDHWtisTGccW7dMljqnAqjdgQEolFw
+
+# app-id: 64ktvbhvba17c92m58vbjql9pp
+# pool-id: eu-central-1_rHWB2uJVf
+'Fn::GetAtt': [ userPool, Arn ]
+'Fn::GetAtt': [ authUserPoolArn, Arn ]
+
+"arn:aws:cognito-idp:eu-central-1:436740350302:userpool/eu-central-1_rHWB2uJVf"
