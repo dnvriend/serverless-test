@@ -8,6 +8,13 @@ sbt assembly
 sls deploy
 ```
 
+## Tools
+- awscala:
+  - home: https://github.com/seratch/AWScala
+  - sbt: libraryDependencies += "com.github.seratch" % "awscala_2.12" % "0.6.1"
+
+
+
 ## Invoke the function
 You can invoke the function with:
 
