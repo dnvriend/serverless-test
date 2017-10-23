@@ -5,44 +5,25 @@ import lift, {Option} from 'space-lift'
 import {NotEmpty} from "validator.ts/decorator/Validation";
 import {Validator} from "validator.ts/Validator";
 
-export class Person {
-    constructor(id: string, name: string, age: string) {
-        this.id = id
-        this.name = name
-        this.age = age
-    }
-
-    static validate(str: string): Promise<Person> {
-        let js = JSON.parse(str)
-        let validator = new Validator()
-        return validator.validateAsync(new Person(
-            Option(js.id).getOrElse(""),
-            Option(js.name).getOrElse(""),
-            Option(js.age).getOrElse("")))
-    }
-
-    id: string;
-
-    @NotEmpty()
-    name: string;
-
-    @NotEmpty()
+export interface Person {
+    id: string; 
+    name: string; 
     age: string;
 }
 
-let mapAttributes = (attributes: AttributeMap) => {
-    return new Person(
-        attributes.id,
-        attributes.name,
-        attributes.age
-    )
+const mapAttributes = (attributes: AttributeMap) => {
+    return {
+        id: attributes.id,
+        name: attributes.name,
+        age: attributes.age
+    }
 };
 
 /**
  * Person Repository
  */
 export class PersonRepository {
-    constructor(public readonly tableName: string, public readonly db: DocumentClient) {
+    constructor(private readonly tableName: string, private readonly db: DocumentClient) {
     }
 
     list(): Promise<never | Array<Person>> {
@@ -96,7 +77,7 @@ export class PersonRepository {
     }
 
     put(person: Person): Promise<never | Option<Person>> {
-        let id = v4();
+        const id = v4();
         return this.db.put({
             TableName: this.tableName,
             Item: {
@@ -105,7 +86,7 @@ export class PersonRepository {
                 age: person.age
             },
         }).promise().then(() => {
-            return Option(new Person(id, person.name, person.age))
-        })
+            return Option({id: id, name: person.name, age: person.age });
+        });
     }
 }

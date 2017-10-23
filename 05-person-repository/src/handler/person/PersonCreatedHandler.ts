@@ -1,7 +1,7 @@
 import {Context} from "aws-lambda";
 import {GetRecordsOutput, Record, Data} from "aws-sdk/clients/kinesis"
 
-let decodeData = (data: Data) => {
+const decodeData = (data: Data) => {
     return new Buffer(data.toString(), 'base64').toString('utf-8')
 };
 
@@ -43,8 +43,8 @@ let decodeData = (data: Data) => {
  * @param {Kinesis.GetRecordsOutput} event
  * @param {Context} ctx
  */
-export let handle = (event: GetRecordsOutput, ctx: Context) => {
-    console.log(`handling event: ${JSON.stringify(event)}`)
+export const handle = (event: GetRecordsOutput, ctx: Context) => {
+    console.log("handling event: ", JSON.stringify(event))
     event.Records
         .map((record: any) => record.kinesis.data)
         .map(decodeData)

@@ -3,7 +3,7 @@ import AttributeMap = DocumentClient.AttributeMap;
 import lift, {Option} from 'space-lift'
 
 export class CounterRepository {
-    constructor(public readonly tableName: string, public readonly db: DocumentClient) {
+    constructor(private readonly tableName: string, private readonly db: DocumentClient) {
     }
 
     update(counterName: string) {
@@ -12,7 +12,7 @@ export class CounterRepository {
             Key: {
                 counter: counterName
             },
-            UpdateExpression: "ADD countervalue = countervalue + :incr",
+            UpdateExpression: "ADD countervalue :incr",
             ExpressionAttributeValues: {
                 ":incr": 1
             },
@@ -22,6 +22,14 @@ export class CounterRepository {
                 .map(items => items.countervalue)
         })
     }
+
+    // cli command
+    // aws dynamodb update-item \
+    // --table-name dev-counters-table \
+    // --key '{"counter":{"S":"c3"}}' \
+    // --update-expression "ADD countervalue :incr" \
+    // --expression-attribute-values '{":incr": { "N": "1"}}' \
+    // --return-values ALL_NEW
 
     // update(counterName: string) {
     //     return this.db.update({

@@ -6,9 +6,9 @@ import lift, {Option} from 'space-lift'
 // node.js, which is available everywhere defines some vars like
 // process, global and console.
 
-let tableName = `${process.env.SLS_STAGE}-counters-table`;
-let docClient = new DynamoDB.DocumentClient();
-let repo = new CounterRepository(tableName, docClient);
+const tableName = `${process.env.SLS_STAGE}-counters-table`;
+const docClient = new DynamoDB.DocumentClient();
+const repo = new CounterRepository(tableName, docClient);
 
 // let createCounterAndRespond = (counterName: string, cb: Callback) => {
 //     console.log(`Creating counter: ${counterName}`);
@@ -26,9 +26,9 @@ let repo = new CounterRepository(tableName, docClient);
 //     }).catch(err => cb(null, {statusCode: 500, body: JSON.stringify(err)}));
 // };
 
-export let nextValue = (event: any, ctx: Context, cb: Callback) => {
-    console.log("handling event: " + JSON.stringify(event));
-    let counterName = event.pathParameters.counterName;
+export const nextValue = (event: any, ctx: Context, cb: Callback) => {
+    console.log("handling event: ", JSON.stringify(event));
+    const counterName = event.pathParameters.counterName;
     repo.update(counterName).then((maybeNumber: Option<any>) => {
         maybeNumber.fold(() => {
             cb(null, {statusCode: 500, body: JSON.stringify(`No counter found for name ${counterName}`)});

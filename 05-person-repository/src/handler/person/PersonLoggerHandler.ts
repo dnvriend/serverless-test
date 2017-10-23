@@ -28,6 +28,6 @@ import {GetRecordsOutput} from "aws-sdk/clients/dynamodbstreams"
  * @param {DynamoDBStreams.GetRecordsOutput} event
  * @param {Context} ctx
  */
-export let handle = (event: GetRecordsOutput, ctx: Context) => {
-    console.log(`handling event: ${JSON.stringify(event)}`);
+export const handle = (event: GetRecordsOutput, ctx: Context) => {
+    console.log("handling event: ", JSON.stringify(event));
 };

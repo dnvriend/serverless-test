@@ -16,7 +16,6 @@
   },
   "exclude": [
     ".vscode",
-    ".serverless",
     ".git"
   ],
   "rootDir": "./src"

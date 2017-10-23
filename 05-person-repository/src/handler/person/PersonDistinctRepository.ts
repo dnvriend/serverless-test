@@ -3,16 +3,12 @@ import v4 = require("uuid/v4");
 import AttributeMap = DocumentClient.AttributeMap;
 import lift, {Option} from 'space-lift'
 
-export class PersonDistinct {
-    constructor(public readonly name: String) {}
+export interface PersonDistinct {
+    name: string;
 }
 
-let mapAttributes = (attributes: AttributeMap) => {
-    return new PersonDistinct(attributes.name)
-};
-
 export class PersonDistinctRepository {
-    constructor(public readonly tableName: string, public readonly db: DocumentClient) {
+    constructor(private readonly tableName: string, private readonly db: DocumentClient) {
     }
 
     list(): Promise<never | Array<PersonDistinct>> {
@@ -20,13 +16,13 @@ export class PersonDistinctRepository {
             TableName: this.tableName
         }).promise().then(data => {
             return Option(data.Items)
-                .map(xs => xs.map(mapAttributes))
+                .map(xs => xs.map(attr => attr.name))
                 .getOrElse([])
         })
     }
 
     put(pd: PersonDistinct): Promise<never | Option<PersonDistinct>> {
-        let id = v4();
+        const id = v4();
         return this.db.put({
             TableName: this.tableName,
             Item: {
