@@ -98,7 +98,10 @@ $ sls -f personcreated-handler logs
 - aws:
   - [Systems Manager Parameter Store (SSM)](http://docs.aws.amazon.com/systems-manager/latest/userguide/systems-manager-paramstore.html)
 
+## AWS Gateway Documentation
+The [serverless-aws-documentation plugin](https://github.com/9cookies/serverless-aws-documentation) by [9Cookies](http://www.9cookies.com/) makes it possible to have support for AWS API Gateway documentation and models (e.g. to export a Swagger JSON file with input/output definitions and full text documentation for API documentation).
 
+To deploy the documentation (models) just do a `serverless deploy` like always. 
 
 ## Resources
 - http://definitelytyped.org/

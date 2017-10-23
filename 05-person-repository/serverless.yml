@@ -3,6 +3,22 @@ service:
 
 plugins:
   - serverless-webpack
+  - serverless-aws-documentation
+
+custom:
+  documentation:
+    models:
+      -
+        name: "CounterResponse"
+        description: "The name and state of the counter"
+        contentType: "application/json"
+        schema:
+          type: object
+          properties:
+            counterName:
+              type: string
+            counterValue:
+              type: number
 
 provider:
   name: aws
@@ -74,6 +90,20 @@ functions:
       - http:
           method: get
           path: /hello
+          documentation:
+            summary: "Returns Hello World"
+            description: ""
+            requestBody:
+              description: "No body is necessary"
+            requestHeaders:
+              - 
+                name: "Authorization"
+                description: "The JWT ID-Token from Cognito"
+            methodResponses:
+              -
+                statusCode: "200"
+                responseBody:
+                  description: "Hello World Body"                
           authorizer:
             arn: 
               "arn:aws:cognito-idp:eu-central-1:436740350302:userpool/eu-central-1_OTWRWDA7U" # 'Fn::GetAtt': [ authUserPoolArn, Arn ] # there is an issue when referencing the Arn, until fixed use hardcoded arn
@@ -83,6 +113,20 @@ functions:
           - http:
               method: get
               path: /counter/{counterName}
+              documentation:
+                summary: "Increments a counter"
+                description: "A stateful service for counters. Each request increments a counter"
+                pathParams:
+                  -
+                    name: "counterName"
+                    description: "The name of the counter to increment"
+                methodResponses:
+                  -
+                    statusCode: "200"
+                    responseBody:
+                      description: "the counter name and value"
+                    responseModels:
+                      "application/json": "CounterResponse"
   list-persons:
         handler: src/handler/person/PersonHandler.list
         events:
