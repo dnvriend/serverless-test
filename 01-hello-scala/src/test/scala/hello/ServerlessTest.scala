@@ -13,7 +13,7 @@ import scala.sys.process._
 
 trait ServerlessTest extends CornichonFeature {
   import scala.concurrent.duration._
-  override lazy val requestTimeout = 60.seconds
+  override lazy val requestTimeout = 24.hours
   lazy val urls: Option[List[String]] = {
     val serviceInfo: String = "sls info".lineStream_!.dropWhile(_ != "Service Information").toList.drop(1).mkString("\n")
     val fields = serviceInfo.parseYaml.asYamlObject.fields
@@ -40,6 +40,8 @@ trait ServerlessTest extends CornichonFeature {
     val url = urls.get.head
     url.substring(0, url.indexOf(".com") + ".com".length)
   }
+
+  override lazy val executeScenariosInParallel: Boolean = true
 
   def getEndpoint(endpoint: String): Option[String] = urls.flatMap(_.find(_.endsWith(endpoint)))
 

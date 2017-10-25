@@ -25,6 +25,7 @@ scalacOptions ++= Seq(
   "-Xfatal-warnings")
 
 parallelExecution in Test := false
+parallelExecution in ItTest := true
 //
 // setting up integration test
 //
