@@ -2,19 +2,15 @@ package com.github.dnvriend.aws.lambda.handler.test
 
 import java.io.File
 
-import cats.Show
 import com.github.agourlay.cornichon.CornichonFeature
-import com.github.agourlay.cornichon.resolver.Resolvable
-import io.circe.{ Encoder, Json => CirceJson }
-import net.jcazevedo.moultingyaml._
 import net.jcazevedo.moultingyaml.DefaultYamlProtocol._
-import play.api.libs.json._
+import net.jcazevedo.moultingyaml._
 
+import scala.concurrent.duration._
 import scala.language.implicitConversions
 import scala.sys.process._
-import scala.concurrent.duration._
 
-trait ServerlessTest extends CornichonFeature {
+trait ServerlessTest extends CornichonFeature with CornichonCircePlayBridge {
   val projectDir: File = (sys.props ++ sys.env).get("SERVERLESS_PROJECT_DIR").map(new File(_)).getOrElse(fail(
     """
       |Environment variable 'SERVERLESS_PROJECT_DIR' not set.
@@ -57,18 +53,4 @@ trait ServerlessTest extends CornichonFeature {
   override lazy val executeScenariosInParallel: Boolean = true
 
   def getEndpoint(endpoint: String): Option[String] = urls.flatMap(_.find(_.endsWith(endpoint)))
-
-  implicit def jsonResolvableForm[A <: Product: Format]: Resolvable[A] = new Resolvable[A] {
-    def toResolvableForm(data: A): String = showJson.show(data)
-
-    def fromResolvableForm(s: String): A = Json.parse(s).as[A]
-  }
-
-  implicit def showJson[A <: Product: Writes]: Show[A] = (data: A) => {
-    Json.toJson(data).toString
-  }
-
-  implicit def JsonEncoder[A <: Product: Writes]: Encoder[A] = (data: A) => {
-    io.circe.parser.parse(Json.toJson(data).toString).getOrElse(CirceJson.Null)
-  }
 }

@@ -3,6 +3,8 @@ package com.github.dnvriend.ops
 import com.amazonaws.services.lambda.runtime.Context
 import scala.language.implicitConversions
 
+object ContextOps extends ContextOps
+
 trait ContextOps {
   implicit def toContextOps(that: Context) = new ContextOpsImpl(that)
 }

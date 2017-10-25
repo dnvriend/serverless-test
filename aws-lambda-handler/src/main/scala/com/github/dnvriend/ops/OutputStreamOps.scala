@@ -5,6 +5,8 @@ import java.io.OutputStream
 import play.api.libs.json.{ Json, Writes }
 import scala.language.implicitConversions
 
+object OutputStreamOps extends OutputStreamOps
+
 trait OutputStreamOps {
   def toOutputStreamOps[A <: Product: Writes](that: A) = new OutputStreamOpsImpl(that)
 }
