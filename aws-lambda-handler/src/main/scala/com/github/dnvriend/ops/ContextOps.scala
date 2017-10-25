@@ -1,4 +1,4 @@
-package ops
+package com.github.dnvriend.ops
 
 import com.amazonaws.services.lambda.runtime.Context
 import scala.language.implicitConversions

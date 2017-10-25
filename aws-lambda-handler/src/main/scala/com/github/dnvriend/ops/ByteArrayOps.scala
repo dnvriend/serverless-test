@@ -1,4 +1,4 @@
-package ops
+package com.github.dnvriend.ops
 
 import java.io.{ ByteArrayInputStream, ByteArrayOutputStream, InputStream, OutputStream }
 import java.nio.ByteBuffer

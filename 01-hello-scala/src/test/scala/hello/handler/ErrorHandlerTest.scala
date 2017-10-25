@@ -1,6 +1,7 @@
 package hello.handler
 
-import hello.{ ErrorHandler, TestSpec }
+import com.github.dnvriend.aws.lambda.handler.test.TestSpec
+import hello.ErrorHandler
 
 class ErrorHandlerTest extends TestSpec {
   it should "return an error" in {

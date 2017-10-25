@@ -1,6 +1,7 @@
 package hello.it
 
-import hello.{ Person, ServerlessTest }
+import com.github.dnvriend.aws.lambda.handler.test.ServerlessTest
+import hello.Person
 
 class PersonValidationNelHandlerIntegrationTest extends ServerlessTest {
   def feature = Feature("Person ValidationNel Handler") {

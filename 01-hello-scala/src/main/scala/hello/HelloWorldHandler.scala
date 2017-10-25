@@ -1,6 +1,7 @@
 package hello
 
 import com.amazonaws.services.lambda.runtime.Context
+import com.github.dnvriend.aws.lambda.handler.{ LambdaRequestHandler, Request, Response }
 import play.api.libs.json.{ Format, Json }
 
 object HelloMessage {

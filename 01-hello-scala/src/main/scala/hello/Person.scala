@@ -1,6 +1,8 @@
 package hello
 
-import play.api.libs.json.{ Format, Json }
+import com.github.dnvriend.aws.lambda.handler.{ValidationException, Validator}
+import play.api.libs.json.{Format, Json}
+
 import scalaz._
 import scalaz.Scalaz._
 

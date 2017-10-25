@@ -1,4 +1,4 @@
-package hello.mock
+package com.github.dnvriend.aws.lambda.handler.mock
 
 import com.amazonaws.services.lambda.runtime._
 

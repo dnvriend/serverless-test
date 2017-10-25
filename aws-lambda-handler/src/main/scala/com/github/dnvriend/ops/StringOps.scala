@@ -1,4 +1,4 @@
-package ops
+package com.github.dnvriend.ops
 
 import java.io.{ ByteArrayInputStream, InputStream }
 import scala.language.implicitConversions

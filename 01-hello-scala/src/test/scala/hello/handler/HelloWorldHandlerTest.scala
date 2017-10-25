@@ -1,6 +1,7 @@
 package hello.handler
 
-import hello.{ HelloMessage, HelloWorldHandler, TestSpec }
+import com.github.dnvriend.aws.lambda.handler.test.TestSpec
+import hello.{ HelloMessage, HelloWorldHandler }
 
 class HelloWorldHandlerTest extends TestSpec {
   it should "return HelloWorld" in {

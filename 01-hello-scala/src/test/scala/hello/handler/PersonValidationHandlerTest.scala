@@ -1,6 +1,7 @@
 package hello.handler
 
-import hello.{ Person, PersonValidationHandler, TestSpec }
+import com.github.dnvriend.aws.lambda.handler.test.TestSpec
+import hello.{ Person, PersonValidationHandler }
 
 class PersonValidationHandlerTest extends TestSpec {
   it should "return Person when posted" in {

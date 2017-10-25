@@ -1,6 +1,6 @@
 package hello.it
 
-import hello.ServerlessTest
+import com.github.dnvriend.aws.lambda.handler.test.ServerlessTest
 
 class HelloWorldIntegrationTest extends ServerlessTest {
   def feature = Feature("HelloWorldHandler") {

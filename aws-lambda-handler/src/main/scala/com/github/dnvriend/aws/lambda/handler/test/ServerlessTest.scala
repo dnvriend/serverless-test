@@ -1,4 +1,6 @@
-package hello
+package com.github.dnvriend.aws.lambda.handler.test
+
+import java.io.File
 
 import cats.Show
 import com.github.agourlay.cornichon.CornichonFeature
@@ -10,28 +12,39 @@ import play.api.libs.json._
 
 import scala.language.implicitConversions
 import scala.sys.process._
+import scala.concurrent.duration._
 
 trait ServerlessTest extends CornichonFeature {
-  import scala.concurrent.duration._
-  override lazy val requestTimeout = 24.hours
+  val projectDir: File = (sys.props ++ sys.env).get("SERVERLESS_PROJECT_DIR").map(new File(_)).getOrElse(fail(
+    """
+      |Environment variable 'SERVERLESS_PROJECT_DIR' not set.
+      |add the following to your build.sbt:
+      |
+      |envVars in Test := Map("SERVERLESS_PROJECT_DIR" -> baseDirectory.value.absolutePath)
+      |
+      |or
+      |
+      |envVars in ItTest := Map("SERVERLESS_PROJECT_DIR" -> baseDirectory.value.absolutePath)
+    """.stripMargin))
+
+  override lazy val requestTimeout: FiniteDuration = 24.hours
+
   lazy val urls: Option[List[String]] = {
-    val serviceInfo: String = "sls info".lineStream_!.dropWhile(_ != "Service Information").toList.drop(1).mkString("\n")
+    val methods = List("GET", "POST", "PATCH", "DELETE", "PUT")
+    val serviceInfo: String = Process("sls info")
+      .lineStream_!
+      .dropWhile(_ != "Service Information")
+      .toList
+      .drop(1)
+      .mkString("\n")
+
     val fields = serviceInfo.parseYaml.asYamlObject.fields
     fields.get("endpoints".toYaml).map(_.convertTo[String])
       .map(_.split(" - "))
       .map(_.toList
+        .map(methods.map((field: String) => (str: String) => str.replace(field, "")).reduce(_ andThen _))
         .map(_.trim)
-        .map(_.replace("GET", ""))
-        .map(_.replace("POST", ""))
-        .map(_.replace("PATCH", ""))
-        .map(_.replace("DELETE", ""))
-        .map(_.replace("PUT", ""))
-        .map(_.trim)
-        .filterNot(_ == "GET")
-        .filterNot(_ == "POST")
-        .filterNot(_ == "PATCH")
-        .filterNot(_ == "DELETE")
-        .filterNot(_ == "PUT")
+        .filterNot(methods.contains)
         .filterNot(_.isEmpty)
       )
   }
@@ -47,6 +60,7 @@ trait ServerlessTest extends CornichonFeature {
 
   implicit def jsonResolvableForm[A <: Product: Format]: Resolvable[A] = new Resolvable[A] {
     def toResolvableForm(data: A): String = showJson.show(data)
+
     def fromResolvableForm(s: String): A = Json.parse(s).as[A]
   }
 

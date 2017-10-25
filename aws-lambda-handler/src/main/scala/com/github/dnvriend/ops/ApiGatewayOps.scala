@@ -1,8 +1,8 @@
-package ops
+package com.github.dnvriend.ops
 
 import java.io.InputStream
 
-import hello.Validator
+import com.github.dnvriend.aws.lambda.handler.Validator
 import play.api.libs.json._
 import play.api.libs.json.{ JsNull, Json }
 

@@ -1,10 +1,10 @@
-package hello
+package com.github.dnvriend.aws.lambda.handler.test
 
 import java.io.{ InputStream, OutputStream }
 
 import com.amazonaws.services.lambda.runtime.Context
-import hello.mock.MockContext
-import ops.AllOps
+import com.github.dnvriend.aws.lambda.handler.mock.MockContext
+import com.github.dnvriend.ops.AllOps
 import org.scalatest.{ FlatSpec, Matchers, OptionValues, TryValues }
 import org.typelevel.scalatest.{ DisjunctionMatchers, DisjunctionValues, ValidationMatchers, ValidationValues }
 import play.api.libs.json._

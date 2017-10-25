@@ -2,7 +2,7 @@ import sbt.Keys._
 import sbt._
 import sbtrelease.Version
 
-name := "hello"
+name := "01-hello-scala"
 
 resolvers += Resolver.sonatypeRepo("public")
 scalaVersion := "2.12.3"
@@ -24,8 +24,6 @@ scalacOptions ++= Seq(
   "-feature",
   "-Xfatal-warnings")
 
-parallelExecution in Test := false
-parallelExecution in ItTest := true
 //
 // setting up integration test
 //
@@ -34,8 +32,14 @@ def unitFilter(name: String): Boolean = (name endsWith "Test") && !itFilter(name
 lazy val ItTest = config("it") extend(Test)
 configs(ItTest)
 inConfig(ItTest)(Defaults.testTasks)
+fork in Test := true
+parallelExecution in Test := false
 testOptions in Test := Seq(Tests.Filter(unitFilter))
+envVars in Test := Map("SERVERLESS_PROJECT_DIR" -> baseDirectory.value.absolutePath)
+fork in ItTest := true
+parallelExecution in ItTest := true
 testOptions in ItTest := Seq(Tests.Filter(itFilter))
+envVars in ItTest := Map("SERVERLESS_PROJECT_DIR" -> baseDirectory.value.absolutePath)
 
 //
 // enable scala code formatting //
@@ -82,8 +86,8 @@ slsDeploy := {
   import scala.sys.process._
   val log = streams.value.log
     log.info("Deploying project")
-    val x = (assembly dependsOn clean).value
-    "sls deploy" ! log
+    (assembly dependsOn clean).value
+    Process("sls deploy", baseDirectory.value) ! log
 }
 
 val slsDeployLambda = inputKey[Unit]("Deploy a single lamda")
@@ -92,9 +96,9 @@ slsDeployLambda := {
   import sbt.complete.DefaultParsers._
   val log = streams.value.log
     val lambdaName: String = (Space ~> StringBasic).parsed
-  log.info(s"Deploying lambda: $lambdaName")
+    log.info(s"Deploying lambda: $lambdaName")
     (assembly dependsOn clean).value
-    s"sls deploy -f $lambdaName" ! log
+    Process(s"sls deploy -f $lambdaName", baseDirectory.value) ! log
 }
 
 val slsInfo = taskKey[Unit]("Get info about the project")
@@ -102,7 +106,7 @@ slsInfo := {
   import scala.sys.process._
   val log = streams.value.log
   log.info("Getting project info")
-  "sls info" ! log
+  Process("sls info", baseDirectory.value) ! log
 }
 
 val slsRemove = taskKey[Unit]("Remove the project from AWS")
@@ -110,7 +114,7 @@ slsRemove := {
   import scala.sys.process._
   val log = streams.value.log
   log.info("Removing project")
-  "sls remove" ! log
+  Process("sls remove", baseDirectory.value) ! log
 }
 
 val integrationTest = taskKey[Unit]("Deploys, test an removes the project")
