@@ -9,32 +9,46 @@ package:
   artifact: target/scala-2.12/hello.jar
 
 functions:
-  method-handler:
-    handler: hello.MethodBased::myHandlerMethod
-  stream-handler:
-    handler: hello.MethodBased::streamHandler
+  ErrorHandler:
+    handler: hello.ErrorHandler::handleRequest
     events:
       - http:
-          path: /stream
+          path: /error
+          method: get
+  HelloHandler:
+    handler: hello.HelloHandler::handleRequest
+    events:
+      - http:
+          path: /hello
+          method: get
+  PersonDisjunctionHandler:
+    handler: hello.PersonDisjunctionHandler::handleRequest
+    events:
+      - http:
+          path: /persondisjunction
           method: post
-#  interface-handler:
-#    handler: hello.RequestHandlerBased
-  input-as-string-handler:
-    handler: hello.MethodBased::inputAsStringHandler
+  PersonDisjunctionNelHandler:
+    handler: hello.PersonDisjunctionNelHandler::handleRequest
     events:
       - http:
-          path: /person
+          path: /persondisjunctionnel
           method: post
-  input-as-gw:
-    handler: hello.MethodBased::inputAsApiGatewayRequest
+  PersonOptionHandler:
+    handler: hello.PersonOptionHandler::handleRequest
     events:
       - http:
-          path: /agr
+          path: /personoption
           method: post
-  scala-handler:
-    handler: hello.MyScalaHandler::handleRequest
+  PersonValidationHandler:
+    handler: hello.PersonValidationHandler::handleRequest
     events:
       - http:
-          path: /
+          path: /personvalidation
+          method: post
+  PersonValidationNelHandler:
+    handler: hello.PersonValidationNelHandler::handleRequest
+    events:
+      - http:
+          path: /personvalidationnel
           method: post
 
