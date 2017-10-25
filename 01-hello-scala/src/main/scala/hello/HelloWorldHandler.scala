@@ -8,7 +8,7 @@ object HelloMessage {
 }
 case class HelloMessage(message: String)
 
-object HelloHandler extends LambdaRequestHandler[HelloMessage] {
+object HelloWorldHandler extends LambdaRequestHandler[HelloMessage] {
   override def handle(request: Request, ctx: Context): Response = {
     HelloMessage("Hello World!")
   }

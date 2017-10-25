@@ -3,7 +3,7 @@ service: helloworld-scala
 provider:
   name: aws
   runtime: java8
-  region:
+  region: eu-central-1
 
 package:
   artifact: target/scala-2.12/hello.jar
@@ -16,7 +16,7 @@ functions:
           path: /error
           method: get
   HelloHandler:
-    handler: hello.HelloHandler::handleRequest
+    handler: hello.HelloWorldHandler::handleRequest
     events:
       - http:
           path: /hello

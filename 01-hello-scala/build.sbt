@@ -80,6 +80,7 @@ val slsDeploy = taskKey[Unit]("Deploy to serverless")
 slsDeploy := {
   import scala.sys.process._
   val log = streams.value.log
+    log.info("Deploying project")
     val x = (assembly dependsOn clean).value
     "sls deploy" ! log
 }
@@ -88,15 +89,32 @@ val slsDeployLambda = inputKey[Unit]("Deploy a single lamda")
 slsDeployLambda := {
   import scala.sys.process._
   import sbt.complete.DefaultParsers._
-    val log = streams.value.log
+  val log = streams.value.log
     val lambdaName: String = (Space ~> StringBasic).parsed
-    val x = (assembly dependsOn clean).value
+  log.info(s"Deploying lambda: $lambdaName")
+    (assembly dependsOn clean).value
     s"sls deploy -f $lambdaName" ! log
 }
 
-val slsInfo = inputKey[Unit]("Get info about the project")
+val slsInfo = taskKey[Unit]("Get info about the project")
 slsInfo := {
   import scala.sys.process._
   val log = streams.value.log
+  log.info("Getting project info")
   "sls info" ! log
+}
+
+val slsRemove = taskKey[Unit]("Remove the project from AWS")
+slsRemove := {
+  import scala.sys.process._
+  val log = streams.value.log
+  log.info("Removing project")
+  "sls remove" ! log
+}
+
+val integrationTest = taskKey[Unit]("Deploys, test an removes the project")
+integrationTest := {
+  val log = streams.value.log
+  log.info("Running full integration test")
+  (slsRemove dependsOn (test in ItTest) dependsOn slsDeploy).value
 }

@@ -4,7 +4,7 @@ import hello.{ Person, ServerlessTest }
 
 class PersonDisjunctionHandlerIntegrationTest extends ServerlessTest {
   def feature = Feature("Person Disjunction Handler") {
-    Scenario("Posting a Person") {
+    Scenario("Posting a Person Disjunction") {
       When I post("/dev/persondisjunction").withBody(Person("Dennis", 42))
       //      And I show_session
       //      And I show_last_status
