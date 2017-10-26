@@ -1,7 +1,9 @@
 package com.github.dnvriend.ops
 
 import java.io.{ ByteArrayInputStream, InputStream }
+
 import scala.language.implicitConversions
+import scala.util.matching.Regex
 
 object StringOps extends StringOps
 
@@ -29,5 +31,13 @@ class StringOpsImpl(that: String) {
   def log: String = {
     println(that)
     that
+  }
+
+  def find(regex: Regex): Option[String] = {
+    regex.findFirstIn(that)
+  }
+
+  def findAll(regex: Regex): List[String] = {
+    regex.findAllIn(that).toList
   }
 }

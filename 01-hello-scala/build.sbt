@@ -29,17 +29,21 @@ scalacOptions ++= Seq(
 //
 def itFilter(name: String): Boolean = name endsWith "IntegrationTest"
 def unitFilter(name: String): Boolean = (name endsWith "Test") && !itFilter(name)
-lazy val ItTest = config("it") extend(Test)
-configs(ItTest)
-inConfig(ItTest)(Defaults.testTasks)
 fork in Test := true
 parallelExecution in Test := false
 testOptions in Test := Seq(Tests.Filter(unitFilter))
-envVars in Test := Map("SERVERLESS_PROJECT_DIR" -> baseDirectory.value.absolutePath)
+envVars in Test := {
+  val serverlessBaseUrlValue = slsBaseUrl.value.getOrElse("")
+  val serverlessBaseUrlKey: String = "SERVERLESS_PROJECT_BASE_URL"
+  Map(serverlessBaseUrlKey -> serverlessBaseUrlValue)
+}
+
+lazy val ItTest = config("it") extend(Test)
+configs(ItTest)
+inConfig(ItTest)(Defaults.testTasks)
 fork in ItTest := true
 parallelExecution in ItTest := true
 testOptions in ItTest := Seq(Tests.Filter(itFilter))
-envVars in ItTest := Map("SERVERLESS_PROJECT_DIR" -> baseDirectory.value.absolutePath)
 
 //
 // enable scala code formatting //
@@ -122,4 +126,13 @@ integrationTest := {
   val log = streams.value.log
   log.info("Running full integration test")
   (slsRemove dependsOn (test in ItTest) dependsOn slsDeploy).value
+}
+
+val slsBaseUrl = taskKey[Option[String]]("Returns the base url of a serverless deployment")
+slsBaseUrl := {
+  import scala.sys.process._
+  val log = streams.value.log
+  log.info("Determine serverless base url")
+  val serviceInfo: String = Process("sls info", baseDirectory.value).lineStream_!(log).toList.mkString("\n")
+  """https://(.+).amazonaws.com""".r.findFirstIn(serviceInfo)
 }
