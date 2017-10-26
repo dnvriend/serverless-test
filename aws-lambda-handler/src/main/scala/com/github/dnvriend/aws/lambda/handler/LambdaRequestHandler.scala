@@ -37,7 +37,7 @@ case class Request(request: JsValue) {
   }
 }
 
-abstract class LambdaRequestHandler[A: Writes] extends RequestStreamHandler with ToResponseConverters {
+abstract class LambdaRequestHandler extends RequestStreamHandler with ToResponseConverters {
 
   override def handleRequest(input: InputStream, output: OutputStream, context: Context): Unit = {
     val request: Request = Request(Json.parse(input))
