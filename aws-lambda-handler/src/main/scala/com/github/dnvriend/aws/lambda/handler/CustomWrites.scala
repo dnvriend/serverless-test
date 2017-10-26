@@ -15,8 +15,8 @@ trait CustomWrites {
     case t: Throwable         => Json.toJson(t.getMessage)
   }
 
-  implicit def NonEmptyListWrites[A: Writes]: Writes[NonEmptyList[A]] = (o: NonEmptyList[A]) => {
-    Json.toJson(o.toList)
+  implicit def NonEmptyListWrites[A: Writes]: Writes[NonEmptyList[A]] = (nel: NonEmptyList[A]) => {
+    Json.toJson(nel.toList)
   }
 
   implicit def JsResultExceptionWrites: Writes[JsResultException] = (err: JsResultException) => {

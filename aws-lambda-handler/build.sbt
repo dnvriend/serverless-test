@@ -18,8 +18,11 @@ libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.3"
 scalacOptions ++= Seq(
   "-unchecked",
   "-deprecation",
+  "-language:higherKinds",
+  "-language:implicitConversions",
   "-feature",
-  "-Xfatal-warnings")
+  "-Xfatal-warnings",
+)
 
 parallelExecution in Test := false
 

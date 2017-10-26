@@ -11,3 +11,4 @@ trait AllOps extends ByteArrayOps
   with ApiGatewayOps
   with AvroOps
   with FunctionalOps
+  with JsonOps
