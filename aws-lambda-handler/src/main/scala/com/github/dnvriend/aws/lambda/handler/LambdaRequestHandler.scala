@@ -3,6 +3,8 @@ package com.github.dnvriend.aws.lambda.handler
 import java.io.{ InputStream, OutputStream }
 
 import com.amazonaws.services.lambda.runtime.{ Context, RequestStreamHandler }
+import com.github.dnvriend.ops.AllOps
+import com.github.dnvriend.ops.Functional.DisjunctionNel
 import play.api.libs.json._
 
 import scala.language.implicitConversions
@@ -14,27 +16,22 @@ object Response {
 }
 case class Response(statusCode: Int, body: JsValue, headers: Map[String, String] = Map.empty[String, String])
 
-case class Request(request: JsValue) {
+case class Request(request: JsValue) extends AllOps {
   def body: JsValue = request("body")
   def pathParameters: JsValue = request("pathParameters")
   def requestParameters: JsValue = request("requestParameters")
-  def bodyOpt[A: Reads]: Option[A] = {
-    bodyAs[A].toOption
-  }
-  def bodyAs[A: Reads](implicit validator: Validator[A] = null): Disjunction[NonEmptyList[Throwable], A] = for {
-    data <- Disjunction.fromTryCatchNonFatal(Json.parse(body.as[String]).as[A]).leftMap(_.wrapNel)
-    validated <- Option(validator).getOrElse(Validator.emptyValidator(data)).validate(data).disjunction
+  def bodyOpt[A: Reads]: Option[A] = bodyAs[A].toOption
+
+  def bodyAs[A: Reads](implicit validator: Validator[A] = null): DisjunctionNel[Throwable, A] = for {
+    data <- Json.parse(body.as[String]).as[A].safeNel
+    validated <- (validator.? | Validator.emptyValidator(data)).validate(data).disjunction
   } yield validated
 
   def bodyAsString: String = body.as[String]
   def pathParamsOpt[A: Reads]: Option[A] = pathParamsAs.toOption
-  def pathParamsAs[A: Reads]: Disjunction[Throwable, A] = Disjunction.fromTryCatchNonFatal {
-    pathParameters.as[A]
-  }
+  def pathParamsAs[A: Reads]: Disjunction[Throwable, A] = pathParameters.as[A].safe
   def requestParamsOpt[A: Reads]: Option[A] = requestParamsAs.toOption
-  def requestParamsAs[A: Reads]: Disjunction[Throwable, A] = Disjunction.fromTryCatchNonFatal {
-    requestParameters.as[A]
-  }
+  def requestParamsAs[A: Reads]: Disjunction[Throwable, A] = requestParameters.as[A].safe
 }
 
 abstract class LambdaRequestHandler extends RequestStreamHandler with ToResponseConverters {

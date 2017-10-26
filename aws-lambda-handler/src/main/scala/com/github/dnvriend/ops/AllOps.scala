@@ -10,3 +10,4 @@ trait AllOps extends ByteArrayOps
   with ContextOps
   with ApiGatewayOps
   with AvroOps
+  with FunctionalOps
