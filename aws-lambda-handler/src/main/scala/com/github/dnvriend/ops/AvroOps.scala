@@ -1,17 +1,3 @@
-// Copyright 2017 Dennis Vriend
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-
 package com.github.dnvriend.ops
 
 import java.io.{ ByteArrayOutputStream, OutputStream }
@@ -30,6 +16,7 @@ object AvroOps extends AvroOps
 trait AvroOps {
   implicit def toAvroSerializeOpsImpl[A <: Product: SchemaFor: ToRecord](a: A): AvroSerializeOpsImpl[A] = new AvroSerializeOpsImpl(a)
   implicit def toAvroDeserializeOpsImpl[A <: Product](bytes: Array[Byte]): AvroDeSerializeOpsImpl = new AvroDeSerializeOpsImpl(bytes)
+  implicit def toAvroDeserializeStringOpsImpl(that: String): AvroDeSerializeStringOpsImpl = new AvroDeSerializeStringOpsImpl(that)
   implicit def toAvroSchemaOps(that: Schema): AvroSchemaOpsImpl = new AvroSchemaOpsImpl(that)
   implicit def toAvroStringOps(that: String): AvroStringOpsImpl = new AvroStringOpsImpl(that)
 
@@ -83,6 +70,24 @@ class AvroSerializeOpsImpl[A <: Product: SchemaFor: ToRecord](data: A) {
   }
 }
 
+class AvroDeSerializeStringOpsImpl(that: String) extends StringOps with AvroOps {
+  def parseAvroBinary[R <: Product: SchemaFor: FromRecord, W <: Product: SchemaFor]: Disjunction[Throwable, R] = {
+    that.parseHex.parseAvroBinary[R, W]
+  }
+
+  def parseAvroBinary[R <: Product: SchemaFor: FromRecord](writerSchema: Schema): Disjunction[Throwable, R] = {
+    that.parseHex.parseAvroBinary[R](writerSchema)
+  }
+
+  def parseAvroJson[R <: Product: SchemaFor: FromRecord, W <: Product: SchemaFor]: Disjunction[Throwable, R] = {
+    that.parseHex.parseAvroJson[R, W]
+  }
+
+  def parseAvroJson[R <: Product: FromRecord: SchemaFor](writerSchema: Schema): Disjunction[Throwable, R] = {
+    that.parseHex.parseAvroJson[R](writerSchema)
+  }
+}
+
 class AvroDeSerializeOpsImpl(bytes: Array[Byte]) {
   def parseAvroBinary[R <: Product: SchemaFor: FromRecord, W <: Product](implicit writerSchemaFor: SchemaFor[W]): Disjunction[Throwable, R] = {
     parseAvroBinary[R](writerSchemaFor())
@@ -101,17 +106,23 @@ class AvroDeSerializeOpsImpl(bytes: Array[Byte]) {
   }
 }
 
-class AvroStringOpsImpl(that: String) {
-  def avroSchema: Schema = {
+class AvroStringOpsImpl(that: String) extends StringOps with ByteArrayOps {
+  def parseAvroSchemaFromString: Schema = {
     new Schema.Parser().parse(that)
+  }
+  def parseAvroSchemaFromHex: Schema = {
+    new Schema.Parser().parse(that.parseHex.toInputStream)
+  }
+  def parseAvroSchemaFromBase64: Schema = {
+    new Schema.Parser().parse(that.parseBase64.toInputStream)
   }
 }
 
-class AvroSchemaOpsImpl(that: Schema) {
+class AvroSchemaOpsImpl(that: Schema) extends StringOps {
   def fingerprint: Array[Byte] = {
     SchemaNormalization.parsingFingerprint("SHA-256", that)
   }
   def toUtf8Array: Array[Byte] = {
-    that.toString.getBytes("UTF-8")
+    that.toString(false).toUtf8Array
   }
 }

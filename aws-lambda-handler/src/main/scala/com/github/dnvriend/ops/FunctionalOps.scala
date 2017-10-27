@@ -1,6 +1,5 @@
 package com.github.dnvriend.ops
 
-import com.github.dnvriend.aws.lambda.handler.ValidationException
 import com.github.dnvriend.ops.Functional.DisjunctionNel
 
 import scala.language.implicitConversions
@@ -30,7 +29,7 @@ trait FunctionalOps {
 class FunctionalOpsImpl[A](that: => A) {
   def safe: Disjunction[Throwable, A] = Disjunction.fromTryCatchNonFatal(that)
   def safeNel: DisjunctionNel[Throwable, A] = Disjunction.fromTryCatchNonFatal(that).leftMap(_.wrapNel)
-  def safeMsg(msg: String): DisjunctionNel[Throwable, A] = safe.leftMap(t => ValidationException(s"$msg, because: '${t.getMessage}'").wrapNel.widen[Throwable])
+  def safeMsg(msg: String): DisjunctionNel[Throwable, A] = safe.leftMap(t => new RuntimeException(s"$msg, because: '${t.getMessage}'").wrapNel.widen[Throwable])
   def ? : Option[A] = Option(that)
   def log(implicit show: Show[A] = null): A = {
     val msg: String = Option(show).map(_.shows(that)).getOrElse(that.toString)

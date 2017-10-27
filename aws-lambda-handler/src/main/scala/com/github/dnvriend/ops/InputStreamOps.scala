@@ -10,7 +10,7 @@ import scalaz.Disjunction
 object InputStreamOps extends InputStreamOps
 
 trait InputStreamOps {
-  implicit def toInputStreamOpsImpl(that: InputStream) = new InputStreamOpsImpl(that)
+  implicit def ToInputStreamOpsImpl(that: InputStream) = new InputStreamOpsImpl(that)
 }
 
 class InputStreamOpsImpl(that: InputStream) {

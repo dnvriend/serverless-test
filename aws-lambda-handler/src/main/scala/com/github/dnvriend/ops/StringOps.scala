@@ -1,3 +1,6 @@
+// Copyright 2017 Dennis Vriend
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
 package com.github.dnvriend.ops
 
 import java.io.{ ByteArrayInputStream, InputStream }
@@ -16,8 +19,16 @@ class StringOpsImpl(that: String) {
     java.util.Base64.getDecoder.decode(that)
   }
 
+  def parseBase64: Array[Byte] = {
+    fromBase64
+  }
+
   def fromHex: Array[Byte] = {
     javax.xml.bind.DatatypeConverter.parseHexBinary(that)
+  }
+
+  def parseHex: Array[Byte] = {
+    fromHex
   }
 
   def toInputStream: InputStream = {
@@ -26,6 +37,10 @@ class StringOpsImpl(that: String) {
 
   def toUtf8Array: Array[Byte] = {
     that.getBytes("UTF-8")
+  }
+
+  def arr: Array[Byte] = {
+    toUtf8Array
   }
 
   def log: String = {
