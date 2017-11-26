@@ -1,0 +1,22 @@
+{
+  "info" : {
+    "title" : "HelloWorldApi"
+  },
+  "schemes" : [ "https" ],
+  "basePath" : "/dev",
+  "swagger" : "2.0",
+  "paths" : {
+    "/hello" : {
+      "get" : {
+        "description" : "hello-api"
+      },
+      "responses" : {
+        "200" : {
+          "schema" : {
+            "type" : "String"
+          }
+        }
+      }
+    }
+  }
+}

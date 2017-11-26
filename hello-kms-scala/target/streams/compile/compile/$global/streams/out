@@ -1,0 +1,7 @@
+[0m[[0m[31merror[0m] [0m[0m/Users/dennis/projects/serverless-test/hello-kms-scala/src/main/scala/com/github/dnvriend/HelloKms.scala:21:54: type mismatch;[0m
+[0m[[0m[31merror[0m] [0m[0m found   : Array[Byte] @@ com.github.dnvriend.ops.UTF8[0m
+[0m[[0m[31merror[0m] [0m[0m    (which expands to)  AnyRef{type Tag = com.github.dnvriend.ops.UTF8; type Self = Array[Byte]}[0m
+[0m[[0m[31merror[0m] [0m[0m required: Array[Byte][0m
+[0m[[0m[31merror[0m] [0m[0m    val payloadToEncrypt: Array[Byte] = "HelloWorld".arr[0m
+[0m[[0m[31merror[0m] [0m[0m                                                     ^[0m
+[0m[[0m[31merror[0m] [0m[0mone error found[0m

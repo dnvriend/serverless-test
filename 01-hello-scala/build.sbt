@@ -58,33 +58,6 @@ SbtScalariform.autoImport.scalariformPreferences := SbtScalariform.autoImport.sc
   .setPreference(DoubleIndentConstructorArguments, true)
   .setPreference(DanglingCloseParenthesis, Preserve)
 
-//
-// enable scalafix linting
-//
-// enable code rewrite and linting //
-scalacOptions ++= scalafixScalacOptions.value // add this line
-scalafixVerbose := false
-
-val lintAndRewrite = taskKey[Unit]("Lints and rewrites Scala code using defined rules")
-
-lintAndRewrite := {
-  // see: https://scalacenter.github.io/scalafix/docs/users/rules
-  List(
-    "RemoveUnusedImports", // https://scalacenter.github.io/scalafix/docs/rules/RemoveUnusedImports
-    "ExplicitResultTypes", // https://scalacenter.github.io/scalafix/docs/rules/ExplicitResultTypes
-    "ProcedureSyntax", // https://scalacenter.github.io/scalafix/docs/rules/ProcedureSyntax
-    "DottyVolatileLazyVal", // https://scalacenter.github.io/scalafix/docs/rules/DottyVolatileLazyVal
-    "ExplicitUnit", // https://scalacenter.github.io/scalafix/docs/rules/ExplicitUnit
-    "DottyVarArgPattern", // https://scalacenter.github.io/scalafix/docs/rules/DottyVarArgPattern
-    "NoAutoTupling", // https://scalacenter.github.io/scalafix/docs/rules/NoAutoTupling
-    "NoValInForComprehension", // https://scalacenter.github.io/scalafix/docs/rules/NoValInForComprehension
-    "NoInfer", // https://scalacenter.github.io/scalafix/docs/rules/NoInfer
-  ).map(rule => s" $rule")
-    .map(rule => scalafix.toTask(rule))
-    .reduce(_ dependsOn _).value
-}
-
-
 val slsDeploy = taskKey[Unit]("Deploy to serverless")
 slsDeploy := {
   import scala.sys.process._

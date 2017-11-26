@@ -1,0 +1,25 @@
+{
+  "AWSTemplateFormatVersion" : "2010-09-09",
+  "Transform" : "AWS::Serverless-2016-10-31",
+  "Description" : "This is an Hello World",
+  "Resources" : {
+    "HelloLambda" : {
+      "Type" : "AWS::Serverless::Function",
+      "Properties" : {
+        "CodeUri" : "s3://dnvriend-lambda-helloworld/06-hello-scala-manual-0.1-SNAPSHOT.zip",
+        "Handler" : "com.github.dnvriend.HelloLambda::handleRequest",
+        "Events" : {
+          "HelloLambdaApi" : {
+            "Type" : "Api",
+            "Properties" : {
+              "Path" : "/hello",
+              "Method" : "GET"
+            }
+          }
+        },
+        "Runtime" : "java8",
+        "Policies" : [ "AWSLambdaBasicExecutionRole" ]
+      }
+    }
+  }
+}
